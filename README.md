@@ -1,8 +1,10 @@
+Forked from aacotroneo/laravel-saml2. This fork aims to provide support for multiple IDPs.
+
 ## Laravel 5 - Saml2
 
-[![Build Status](https://travis-ci.org/aacotroneo/laravel-saml2.svg)](https://travis-ci.org/aacotroneo/laravel-saml2)
+[![Build Status](https://travis-ci.org/marketredesign/laravel-saml2.svg)](https://travis-ci.org/marketredesign/laravel-saml2)
 
-[check https://github.com/aacotroneo/laravel-saml2/tree/remove_mcrypt for a mcrypt free version ]
+[check https://github.com/marketredesign/laravel-saml2/tree/remove_mcrypt for a mcrypt free version ]
 
 A Laravel package for Saml2 integration as a SP (service provider) based on  [OneLogin](https://github.com/onelogin/php-saml) toolkit, which is much lighter and easier to install than simplesamlphp SP. It doesn't need separate routes or session storage to work!
 
@@ -14,7 +16,7 @@ The aim of this library is to be as simple as possible. We won't mess with Larav
 You can install the package via composer:
 
 ```
-composer require aacotroneo/laravel-saml2
+composer require marketredesign/laravel-saml2
 ```
 
 If you are using Laravel 5.5 and up, the service provider will automatically get registered.
