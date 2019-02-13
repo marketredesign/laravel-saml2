@@ -6,6 +6,8 @@ use Aacotroneo\Saml2\Events\Saml2LoginEvent;
 use Aacotroneo\Saml2\Saml2Auth;
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
+use OneLogin_Saml2_Auth;
+use URL;
 
 
 class Saml2Controller extends Controller
@@ -13,12 +15,44 @@ class Saml2Controller extends Controller
 
     protected $saml2Auth;
 
+    protected $idp;
+
     /**
-     * @param Saml2Auth $saml2Auth injected.
+     * @param Request $request
      */
-    function __construct(Saml2Auth $saml2Auth)
+    function __construct(Request $request)
     {
-        $this->saml2Auth = $saml2Auth;
+        $this->idp = explode('/', $request->path())[0];
+
+        if (!$this->idp) {
+            $this->idp = 'test';
+        }
+
+        $config = config('saml2.' . $this->idp . '_idp_settings');
+
+        if (empty($config['sp']['entityId'])) {
+            $config['sp']['entityId'] = URL::route($this->idp . '_metadata');
+        }
+        if (empty($config['sp']['assertionConsumerService']['url'])) {
+            $config['sp']['assertionConsumerService']['url'] = URL::route($this->idp . '_acs');
+        }
+        if (!empty($config['sp']['singleLogoutService']) &&
+            empty($config['sp']['singleLogoutService']['url'])) {
+            $config['sp']['singleLogoutService']['url'] = URL::route($this->idp . '_sls');
+        }
+        if (strpos($config['sp']['privateKey'], 'file://')===0) {
+            $config['sp']['privateKey'] = $this->extractPkeyFromFile($config['sp']['privateKey']);
+        }
+        if (strpos($config['sp']['x509cert'], 'file://')===0) {
+            $config['sp']['x509cert'] = $this->extractCertFromFile($config['sp']['x509cert']);
+        }
+        if (strpos($config['idp']['x509cert'], 'file://')===0) {
+            $config['idp']['x509cert'] = $this->extractCertFromFile($config['idp']['x509cert']);
+        }
+
+        $auth = new OneLogin_Saml2_Auth($config);
+
+        $this->saml2Auth = new Saml2Auth($auth);
     }
 
 
@@ -52,7 +86,7 @@ class Saml2Controller extends Controller
         }
         $user = $this->saml2Auth->getSaml2User();
 
-        event(new Saml2LoginEvent($user, $this->saml2Auth));
+        event(new Saml2LoginEvent($this->idp, $user, $this->saml2Auth));
 
         $redirectUrl = $user->getIntendedUrl();
 
@@ -71,7 +105,7 @@ class Saml2Controller extends Controller
      */
     public function sls()
     {
-        $error = $this->saml2Auth->sls(config('saml2_settings.retrieveParametersFromServer'));
+        $error = $this->saml2Auth->sls($this->idp, config('saml2_settings.retrieveParametersFromServer'));
         if (!empty($error)) {
             throw new \Exception("Could not log out");
         }
