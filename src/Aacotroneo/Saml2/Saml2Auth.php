@@ -110,11 +110,11 @@ class Saml2Auth
         $errors = $auth->getErrors();
 
         if (!empty($errors)) {
-            return $errors;
+            return array('error' => $errors, 'last_error_reason' => $auth->getLastErrorReason());
         }
 
         if (!$auth->isAuthenticated()) {
-            return array('error' => 'Could not authenticate');
+            return array('error' => 'Could not authenticate', 'last_error_reason' => $auth->getLastErrorReason());
         }
 
         return null;
@@ -125,21 +125,25 @@ class Saml2Auth
      * Process a Saml response (assertion consumer service)
      * returns an array with errors if it can not logout
      */
-    function sls($retrieveParametersFromServer = false)
+    function sls($idp, $retrieveParametersFromServer = false)
     {
         $auth = $this->auth;
 
         // destroy the local session by firing the Logout event
         $keep_local_session = false;
-        $session_callback = function () {
-            event(new Saml2LogoutEvent());
+        $session_callback = function () use ($idp) {
+            event(new Saml2LogoutEvent($idp));
         };
 
         $auth->processSLO($keep_local_session, null, $retrieveParametersFromServer, $session_callback);
 
         $errors = $auth->getErrors();
 
-        return $errors;
+        if (!empty($errors)) {
+            return array('error' => $errors, 'last_error_reason' => $auth->getLastErrorReason());
+        }
+
+        return null;
     }
 
     /**

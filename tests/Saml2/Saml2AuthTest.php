@@ -59,6 +59,7 @@ class Saml2AuthTest extends TestCase
         $saml2 = new Saml2Auth($auth);
         $auth->shouldReceive('processResponse')->once();
         $auth->shouldReceive('getErrors')->once()->andReturn(array('errors'));
+        $auth->shouldReceive('getLastErrorReason')->once()->andReturn('last_error_reason');
 
         $error = $saml2->acs();
 
@@ -73,6 +74,7 @@ class Saml2AuthTest extends TestCase
         $auth->shouldReceive('processResponse')->once();
         $auth->shouldReceive('getErrors')->once()->andReturn(null);
         $auth->shouldReceive('isAuthenticated')->once()->andReturn(false);
+        $auth->shouldReceive('getLastErrorReason')->once()->andReturn(null);
         $error =  $saml2->acs();
 
         $this->assertNotEmpty($error);
@@ -98,8 +100,9 @@ class Saml2AuthTest extends TestCase
         $saml2 = new Saml2Auth($auth);
         $auth->shouldReceive('processSLO')->once();
         $auth->shouldReceive('getErrors')->once()->andReturn('errors');
+        $auth->shouldReceive('getLastErrorReason')->once()->andReturn('last_error_reason');
 
-        $error =  $saml2->sls();
+        $error =  $saml2->sls('test');
 
         $this->assertNotEmpty($error);
     }
@@ -111,7 +114,7 @@ class Saml2AuthTest extends TestCase
         $auth->shouldReceive('processSLO')->once();
         $auth->shouldReceive('getErrors')->once()->andReturn(null);
 
-        $error =  $saml2->sls();
+        $error =  $saml2->sls('test');
 
         $this->assertEmpty($error);
     }

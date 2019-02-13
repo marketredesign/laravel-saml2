@@ -29,6 +29,7 @@ class Saml2ServiceProvider extends ServiceProvider
 
         $this->publishes([
             __DIR__.'/../../config/saml2_settings.php' => config_path('saml2_settings.php'),
+            __DIR__.'/../../config/test_idp_settings.php' => config_path('saml2.test_idp_settings.php'),
         ]);
 
         if (config('saml2_settings.proxyVars', false)) {
@@ -43,41 +44,7 @@ class Saml2ServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->registerOneLoginInContainer();
-
-        $this->app->singleton('Aacotroneo\Saml2\Saml2Auth', function ($app) {
-
-            return new \Aacotroneo\Saml2\Saml2Auth($app['OneLogin_Saml2_Auth']);
-        });
-
-    }
-
-    protected function registerOneLoginInContainer()
-    {
-        $this->app->singleton('OneLogin_Saml2_Auth', function ($app) {
-            $config = config('saml2_settings');
-            if (empty($config['sp']['entityId'])) {
-                $config['sp']['entityId'] = URL::route('saml_metadata');
-            }
-            if (empty($config['sp']['assertionConsumerService']['url'])) {
-                $config['sp']['assertionConsumerService']['url'] = URL::route('saml_acs');
-            }
-            if (!empty($config['sp']['singleLogoutService']) &&
-                empty($config['sp']['singleLogoutService']['url'])) {
-                $config['sp']['singleLogoutService']['url'] = URL::route('saml_sls');
-            }
-            if (strpos($config['sp']['privateKey'], 'file://')===0) {
-                $config['sp']['privateKey'] = $this->extractPkeyFromFile($config['sp']['privateKey']);
-            }
-            if (strpos($config['sp']['x509cert'], 'file://')===0) {
-                $config['sp']['x509cert'] = $this->extractCertFromFile($config['sp']['x509cert']);
-            }
-            if (strpos($config['idp']['x509cert'], 'file://')===0) {
-                $config['idp']['x509cert'] = $this->extractCertFromFile($config['idp']['x509cert']);
-            }
-
-            return new OneLogin_Saml2_Auth($config);
-        });
+        // Moved to Saml2Controller
     }
 
     /**
