@@ -11,7 +11,7 @@ foreach (config('saml2_settings.idpNames') as $key => $value) {
             'uses' => 'Aacotroneo\Saml2\Http\Controllers\Saml2Controller@logout',
         ));
 
-        Route::get('/login', array(
+        Route::get('/login/{username?}', array(
             'as' => $value . '_login',
             'uses' => 'Aacotroneo\Saml2\Http\Controllers\Saml2Controller@login',
         ));

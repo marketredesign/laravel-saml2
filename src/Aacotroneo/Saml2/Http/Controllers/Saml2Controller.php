@@ -6,7 +6,7 @@ use Aacotroneo\Saml2\Events\Saml2LoginEvent;
 use Aacotroneo\Saml2\Saml2Auth;
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
-use OneLogin_Saml2_Auth;
+use OneLogin\Saml2\Auth as OneLogin_Saml2_Auth;
 use URL;
 
 
@@ -155,9 +155,15 @@ class Saml2Controller extends Controller
     /**
      * This initiates a login request
      */
-    public function login()
+    public function login(Request $request, $username = null)
     {
-        $this->saml2Auth->login(config('saml2_settings.loginRoute'));
+        $params = array();
+
+        if ($username) {
+            $params['username'] = $username;
+        }
+
+        $this->saml2Auth->login(config('saml2_settings.loginRoute'), $params);
     }
 
 }
