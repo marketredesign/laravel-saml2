@@ -1,7 +1,6 @@
 <?php
 namespace Aacotroneo\Saml2;
 
-use OneLogin\Saml2\Auth as OneLogin_Saml2_Auth;
 use OneLogin\Saml2\Utils as OneLogin_Saml2_Utils;
 use URL;
 use Illuminate\Support\ServiceProvider;
@@ -29,8 +28,11 @@ class Saml2ServiceProvider extends ServiceProvider
 
         $this->publishes([
             __DIR__.'/../../config/saml2_settings.php' => config_path('saml2_settings.php'),
-            __DIR__.'/../../config/test_idp_settings.php' => config_path('saml2.test_idp_settings.php'),
-        ]);
+        ], 'saml-config');
+
+        $this->publishes([
+            __DIR__.'/../../migrations' => database_path('migrations'),
+        ], 'saml-migrations');
 
         if (config('saml2_settings.proxyVars', false)) {
             OneLogin_Saml2_Utils::setProxyVars(true);
