@@ -25,4 +25,17 @@ class IdProvider extends Model
      * @var bool
      */
     public $incrementing = false;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'domain',
+        'entity_id',
+        'sso_url',
+        'slo_url',
+        'cert_fingerprint',
+    ];
 }

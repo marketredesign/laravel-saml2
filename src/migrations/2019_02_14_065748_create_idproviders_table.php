@@ -20,6 +20,8 @@ class CreateIdprovidersTable extends Migration
             $table->string('sso_url');
             $table->string('slo_url');
             $table->string('cert_fingerprint');
+
+            $table->timestamps();
         });
     }
 
